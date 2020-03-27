@@ -16,51 +16,43 @@
 
 window.findNRooksSolution = function(n) {
   var solution = []; //fixme
-  
-  function isSafe(row, col, matrix){
-    for(var i = 0; i < n; i++){
-      if(i !== col){
-        if(matrix[row][i]){
-          return false;
-        }
-      }
-      if(i !== row){
-        if(matrix[i][col]){ 
-          return false;
-        }
-      }
+  var rook = function(col) { 
+  if (col >= n){ 
+    return true; 
+  }
+    for (var i = 0; i < n; i++) {
+        if (isSafe(i, col)) { 
+            solution[i][col] = 1; 
+            if (rook(col + 1)){ 
+                return true; 
+            }
+            solution[i][col] = 0; // BACKTRACK 
+        } 
     } 
-    return true;
-  }
-  var buildRook = function(matrix, freeSpace){
-    var x = n;
-    for(var i = 0; i < n;  i++){
-      for(var j = 0; j< n; j++){
-        if(this.isSafe(i, j, matrix)){
-          this.buildRook(matrix, freeSpace);
-          matrix[i][j] = 1;
-          freeSpace--;
-          if(freeSpace === 0){
-            return matrix;
-          }
+    return false; 
+} 
+  var isSafe = function(row, col){ 
+    var i, j; 
+    for (i = 0; i < col; i++) {
+        if (solution[row][i]){ 
+            return false; 
         }
-      }
+    }    
+    return true; 
+} 
+var init = function(){
+    solution = new Array(n);
+    for(var i = 0; i < n ; i++){
+        var temp = new Array(n);
+        for(var j = 0; j < n; j++){
+            temp[j] = 0;
+        }
+        solution[i] = temp;
     }
-  }
-
-  function run(){
-    var matrix = new Array(n);
-    for(var i = 0; i < n; i++){
-      var temp = new Array(n);
-      for(var j = 0; j < n; j++){
-        temp[j] = 0;
-     }
-      matrix[i] = temp;
-    }
-    solution = this.buildRook(matrix, n);
+}
+init();
+rook(0);
   
-  }
-  run();
   console.log (solution);
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
@@ -69,23 +61,164 @@ window.findNRooksSolution = function(n) {
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
   var solutionCount = undefined  ; //fixme
-
+  var solution = []; //fixme
+  var Nsolution = 0;
+  var rook = function(col) { 
+  if (col >= n){ 
+    return true; 
+  }
+    for (var i = 0; i < n; i++) {
+        if (isSafe(i, col)) { 
+            solution[i][col] = 1; 
+            if (rook(col + 1)){ 
+                Nsolution++; 
+            }
+            solution[i][col] = 0; // BACKTRACK 
+        } 
+    } 
+    return false; 
+} 
+  var isSafe = function(row, col){ 
+    var i, j; 
+    for (i = 0; i < col; i++) {
+        if (solution[row][i]){ 
+            return false; 
+        }
+    }    
+    return true; 
+} 
+var init = function(){
+    solution = new Array(n);
+    for(var i = 0; i < n ; i++){
+        var temp = new Array(n);
+        for(var j = 0; j < n; j++){
+            temp[j] = 0;
+        }
+        solution[i] = temp;
+    }
+}
+init();
+rook(0);
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  return solutionCount;
+  return Nsolution;
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+  var queen = function(col) { 
+   if (col >= n){ 
+        return true;
+   } 
+    for (var i = 0; i < n; i++) { 
+      if (isSafe(i, col)) { 
+      board[i][col] = 1;
+        if (queen(col + 1)){ 
+           return true; 
+        }
+       board[i][col] = 0; // BACKTRACK 
+      } 
+    } 
+    return false; 
+} 
+  var isSafe = function(row, col){ 
+    var i, j; 
+    for (i = 0; i < col; i++) {
+      if (board[row][i]) {
+        return false; 
+      }
+    } 
+    /* Check upper diagonal on left side */
+    for (i = row, j = col; i >= 0 && j >= 0; i--, j--){ 
+        if (board[i][j]) {
+            return false;
+        }     
+    }  
+    /* Check lower diagonal on left side */
+    for (i = row, j = col; j >= 0 && i < n; i++, j--){ 
+        if (board[i][j]) {
+            return false; 
+        }    
+    }
+    return true; 
+} 
+var board;
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
+    board = new Array(n);
+    for(var i = 0; i < n ; i++){
+      var temp = new Array(n);
+        for(var j = 0; j < n; j++){
+            temp[j] = 0;
+        }
+        board[i] = temp;
+    }
+
+queen(0);
+console.log("board", board)
+console.log("n ", n);
+if(n === 0){
+  return [];
+}
+
+  console.log('Single solution for ' + n + ' queens:', JSON.stringify(board));
+  return board;
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var Nsolution = 0;
+  var queen = function(col) { 
+    if (col >= n){ 
+         return true;
+    } 
+     for (var i = 0; i < n; i++) { 
+       if (isSafe(i, col)) { 
+       board[i][col] = 1;
+         if (queen(col + 1)){ 
+            Nsolution++; 
+         }
+        board[i][col] = 0; // BACKTRACK 
+       } 
+     } 
+     return false; 
+ } 
+   var isSafe = function(row, col){ 
+     var i, j; 
+     for (i = 0; i < col; i++) {
+       if (board[row][i]) {
+         return false; 
+       }
+     } 
+     /* Check upper diagonal on left side */
+     for (i = row, j = col; i >= 0 && j >= 0; i--, j--){ 
+         if (board[i][j]) {
+             return false;
+         }     
+     }  
+     /* Check lower diagonal on left side */
+     for (i = row, j = col; j >= 0 && i < n; i++, j--){ 
+         if (board[i][j]) {
+             return false; 
+         }    
+     }
+     return true; 
+ } 
+ var board;
+ 
+     board = new Array(n);
+     for(var i = 0; i < n ; i++){
+       var temp = new Array(n);
+         for(var j = 0; j < n; j++){
+             temp[j] = 0;
+         }
+         board[i] = temp;
+     }
+ 
+ queen(0);
+ console.log("board", board)
+ console.log("n ", n);
+ 
+   
 
-  console.log('Number of solutions for ' + n + ' queens:', solutionCount);
-  return solutionCount;
+  //console.log('Number of solutions for ' + n + ' queens:', solutionCount);
+  return Nsolution;
 };
